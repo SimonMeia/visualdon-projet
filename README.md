@@ -12,4 +12,7 @@ Utilisation possible des graphiques suivants :
 * Timeline
 * Diagram de Sankey
 
-Lien utile : https://cambridge-intelligence.com/the-basics-of-timeline-data-visualization/
+Lien utile :  https://cambridge-intelligence.com/the-basics-of-timeline-data-visualization/
+              https://www.d3-graph-gallery.com/graph/heatmap_tooltip.html
+## Wireframe
+Lien du wireframe : https://github.com/SimonHEIG/visualdon-projet/blob/main/WireFrame.png
