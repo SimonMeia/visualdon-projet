@@ -1,14 +1,84 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
+
 <head>
     <meta charset="UTF-8">
-    <title>04-gapminder</title>
+    <title>Projet VisualDon</title>
     <link rel="shortcut icon" href="../assets/img/favicon.ico">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+
     <script src="https://d3js.org/d3-queue.v3.min.js"></script>
 </head>
+
 <body>
-    <div id="graphique"></div>
-    <div id="map"></div>
+    <header>
+        <h1>Les heures de coucher de Simon</h1>
+        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Corrupti culpa minus libero ipsum incidunt, rerum
+            repellendus harum! Laboriosam quos quaerat cupiditate error aperiam tempora, ullam molestiae optio,
+            quisquam, nemo dolore.</p>
+    </header>
+    <main>
+        <div id="periodes">
+            <h2>Periodes de l'année</h2>
+            <div id="periodeInfos">
+                <span class="material-icons-outlined">
+                    dark_mode
+                </span>
+                <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Maxime a minus similique quasi! Enim
+                    accusamus quis quam quidem sit. Vel eligendi explicabo quos optio quaerat praesentium veniam rerum
+                    error doloribus.</p>
+            </div>
+            <div id="slider">
+                <span class="material-icons-outlined">
+                    west
+                </span>
+                <span class="material-icons-outlined">
+                    east
+                </span>
+            </div>
+            <div id="heatmap">
+                <h3>Heatmap</h3>
+            </div>
+            <div id="statistiques">
+                <div class="statistique" id="couchePlusTard">
+                    <span class="material-icons-outlined">
+                        dark_mode
+                    </span>
+                    Couché le plus tard
+                    <span>4h20</span>
+                </div>
+                <div class="statistique" id="couchePlusTot">
+                    <span class="material-icons-outlined">
+                        dark_mode
+                    </span>
+                    Couché le plus tôt
+                    <span>4h20</span>
+                </div>
+                <div class="statistique" id="moyenneSemaine">
+                    <span class="material-icons-outlined">
+                        dark_mode
+                    </span>
+                    Moyenne en semaine
+                    <span>4h20</span>
+                </div>
+                <div class="statistique" id="moyenneWeekend">
+                    <span class="material-icons-outlined">
+                        dark_mode
+                    </span>
+                    Moyenn en weekend
+                    <span>4h20</span>
+                </div>
+            </div>
+        </div>
+        <div id="extremes">
+            <h2>Les extrèmes</h2>
+        </div>
+        <div id="tranches">
+            <h2>Tranches horaire</h2>
+        </div>
+    </main>
 </body>
 
 
