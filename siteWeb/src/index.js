@@ -16,28 +16,24 @@ function createHeatMapData(monthData) {
             let jourSemaine = nomJourSemaine[col]
             let added = false;
 
-            // console.log(convertGetDay(firstDayOfMonth.getDay()))
             if (compteurJour == 0 && col == convertGetDay(firstDayOfMonth.getDay())) {
                 compteurJour++
             }
             if (compteurJour != 0) {
                 for (let date of monthData) {
                     if (date.date.getDate() == compteurJour) {
-                        console.log(date.date.getDate())
-                        console.log(compteurJour)
                         dataArray.push({ "col": jourSemaine, "ligne": ligne, "minutesMinuit": date.minutesMinuit })
                         added = true
                     }
                 }
                 compteurJour++
-            }else if (compteurJour != 0 && !added) {
+            } else if (compteurJour != 0 && !added) {
                 dataArray.push({ "col": jourSemaine, "ligne": ligne, "minutesMinuit": null })
                 compteurJour++
             }
 
         }
     }
-    console.log(dataArray);
     return dataArray;
 }
 
@@ -65,6 +61,21 @@ function createAllHeatMapDataFromPeriod(periodData) {
         finalData.push(createHeatMapData(data))
     }
     return (finalData)
+}
+
+function createAllPeriodesData(allData) {
+    let periodes = []
+    let nbPeriodes = allData[allData.length - 1].periode
+    for (let i = 0; i < nbPeriodes; i++) {
+        let tempArray = []
+        for (const date of allData) {
+            if (date.periode == i + 1) {
+                tempArray.push(date)
+            }
+        }
+        periodes.push(createAllHeatMapDataFromPeriod(tempArray))
+    }
+    return periodes;
 }
 
 function getFirstDayOfMonth(year, month) {
@@ -102,8 +113,6 @@ function displayHeatMap(chartData, heatMapID) {
     // Labels of row and columns
     var semaine = [4, 3, 2, 1, 0]
     var jourSemaine = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"]
-    // var jourSemaine = ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"]
-    // var jourSemaine = [0, 1, 2, 3, 4, 5, 6]
 
     // append the svg object to the body of the page
     let idName = "heatmap-" + heatMapID
@@ -137,9 +146,10 @@ function displayHeatMap(chartData, heatMapID) {
         .call(d3.axisLeft(y));
 
     // Build color scale
-    var myColor = d3.scaleLinear()
-        .range(["white", "#69b3a2"])
-        .domain([-100, 100])
+
+    var myColor = d3.scaleThreshold()
+        .domain([-240, -120, 0, 120, 240])
+        .range(d3.schemeBlues[5])
 
     //Read the data
 
@@ -154,16 +164,50 @@ function displayHeatMap(chartData, heatMapID) {
         .style("fill", function (d) { return myColor(d.minutesMinuit) })
 }
 
-function displayAllHeatMap(allChartData) {
-    d3.select("#heatmap-graphic").innerHTML = ''
+function displayAllHeatMapFromPeriode(periode) {
+    let periodeData = allPeriodes[periode - 1]
+    while (heatmapgraphic.firstChild) {
+        heatmapgraphic.removeChild(heatmapgraphic.firstChild);
+    }
     let counter = 1
-    for (const dataSet of allChartData) {
+    for (const dataSet of periodeData) {
         displayHeatMap(dataSet, counter)
         counter++
     }
 }
 
-/***** APPEL DES FONCTIONS ******/
+/********** ANIMATION **********/
 
-let chartData = createAllHeatMapDataFromPeriod(heuresDeCoucher)
-displayAllHeatMap(chartData)
+// Variable où on stocke l'id de notre intervalle
+let nIntervId;
+
+function animate() {
+    // regarder si l'intervalle a été déjà démarré
+    if (!nIntervId) {
+        nIntervId = setInterval(play, 1000);
+    }
+    console.log(nIntervId);
+}
+
+
+let i = 0;
+
+function play() {
+    if (i == allPeriodes.length) {
+        i = 1;
+    } else {
+        i++;
+    }
+
+    // Update de l'année courante
+    // d3.select('#anneeCourante').text(dataCombined[i].annee)
+    displayAllHeatMapFromPeriode(i);
+}
+
+
+/***** APPEL DES FONCTIONS / CONFIG******/
+
+let heatmapgraphic = document.querySelector('#heatmap-graphic');
+let allPeriodes = createAllPeriodesData(heuresDeCoucher)
+// animate()
+displayAllHeatMapFromPeriode(4)
