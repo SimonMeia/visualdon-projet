@@ -1,12 +1,101 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+
 html {
-    /* background-image: url('../assets/img/background.svg'); */
+    background-color: rgb(34, 72, 160);
+    font-family: Roboto;
+    color: white;
 }
 
-body{
-    /* width: 1080px; */
+#periodeInfos p{
+    height: 2rem;
+}
+
+#heatmapContent,
+#statistiquesContent {
+    width: 1080px;
     margin: auto;
+    text-align: center;
+}
+header, #periodeContent {
+    width: 800px;;
+    margin: auto;
+    text-align: center;
 }
 
-#heatmap-graphic{
+body {
+    margin: 0;
+}
+
+#slider {
     display: flex;
+}
+
+#slider input{
+    width: 100%;
+    accent-color: rgb(34, 72, 160);
+}
+
+#slider button{
+    background-color: aliceblue;
+    border: none;
+}
+
+#slider span{
+    font-size: 2.2rem;
+    margin: 0.5rem;
+}
+
+#heatmap, #periodes {
+    background-color: aliceblue;
+    color: rgb(34, 72, 160);
+}
+
+#heatmap-graphic {
+    display: flex;
+    justify-content: center;
+}
+
+#heatmapContent, #periodeContent {
+    padding-top: 1px;
+}
+
+.moisHeatMap {
+    margin-top: 0px;
+    text-align: center;
+}
+
+#statistiques {
+    padding-top: 10px;
+}
+
+#statistiquesContent {
+    text-align: left;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.statistique {
+    display: flex;
+    flex-basis: 30%;
+    background-color: rgb(34, 72, 160);
+    color: aliceblue;
+    margin: 10px;
+    align-items: baseline;
+    border-radius: 5px;
+    padding: 20px;
+}
+
+
+.statIcon {
+    /* flex-grow: 1; */
+}
+
+.statLabel {
+    flex-grow: 2;
+}
+
+.heure {
+    font-size: x-large;
 }
