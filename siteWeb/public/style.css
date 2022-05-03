@@ -6,12 +6,8 @@ html {
     color: white;
 }
 
-#periodeInfos p{
-    height: 2rem;
-}
-
 #heatmapContent,
-#statistiquesContent {
+#statistiquesContent, #etremesContent {
     width: 1080px;
     margin: auto;
     text-align: center;
@@ -36,13 +32,14 @@ body {
 }
 
 #slider button{
-    background-color: aliceblue;
-    border: none;
+    margin: 0.25rem;
+    height: 3rem;
+    width: 4rem;
 }
 
 #slider span{
-    font-size: 2.2rem;
-    margin: 0.5rem;
+    vertical-align: middle;
+    font-size: 1.5rem;
 }
 
 #heatmap, #periodes {
@@ -66,6 +63,7 @@ body {
 
 #statistiques {
     padding-top: 10px;
+    padding-bottom: 10px;
 }
 
 #statistiquesContent {

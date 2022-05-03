@@ -6,7 +6,10 @@
     <title>Projet VisualDon</title>
     <link rel="shortcut icon" href="../assets/img/favicon.ico">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+    <link rel="stylesheet"
+        href="https://fonts.sandbox.google.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,1,0" />
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
     <link rel="stylesheet" href="style.css">
 
     <script src="https://d3js.org/d3-queue.v3.min.js"></script>
@@ -31,13 +34,6 @@
         <div id="periodes">
             <div id="periodeContent">
                 <h2>Periodes de l'année</h2>
-                <div id="periodeInfos">
-                    <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Maxime a minus similique quasi! Enim
-                        accusamus quis quam quidem sit. Vel eligendi explicabo quos optio quaerat praesentium veniam
-                        rerum
-                        error doloribus.
-                    </p>
-                </div>
                 <div id="slider">
                     <input id="slider-input" type="range" min="1" max="20">
                     <button id="btn-previous">
@@ -46,7 +42,7 @@
                         </span>
                     </button>
                     <button id="btn-play">
-                        <span class="material-icons-outlined">
+                        <span class="material-symbols-outlined">
                             play_arrow
                         </span>
                     </button>
@@ -61,11 +57,14 @@
                         </span>
                     </button>
                 </div>
+                <div id="periodeInfos">
+                    <h3>Nom de la periode</h3>
+                </div>
             </div>
             <div id="heatmap-global">
                 <div id="heatmap">
                     <div id="heatmapContent">
-                        <h3>Heatmap</h3>
+                        <!-- <h3>Heatmap</h3> -->
                         <div id="heatmap-graphic"></div>
                     </div>
                 </div>
@@ -93,7 +92,9 @@
             </div>
         </div>
         <div id="extremes">
-            <h2>Les extrêmes</h2>
+            <div id="etremesContent">
+                <h2>Les extrêmes</h2>
+            </div>
         </div>
         <div id="tranches">
             <h2>Tranches horaire</h2>
