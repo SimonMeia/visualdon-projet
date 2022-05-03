@@ -13,6 +13,7 @@ let playing = false;
 let heatmapgraphic = document.querySelector('#heatmap-graphic');
 let allPeriodes = createAllPeriodesData(heuresDeCoucher)
 
+
 /*********** MISE EN FORME DES DONNEES ***********/
 
 /**
@@ -229,6 +230,7 @@ function addZero(number) {
     return number
 }
 
+
 /*********** AFFICHAGE + GRAPHIQUES ***********/
 
 function displayHeatMap(chartData, heatMapID) {
@@ -330,13 +332,20 @@ function displayStatisticsFromPeriode(periodeId) {
 }
 
 function displeyPeriodeDetails(periodeId) {
-    let periodeInfo = document.querySelector('#periodeInfos p')
+    let periodeInfo = document.querySelector('#periodeInfos h3')
     console.log(detailsPeriodes);
     periodeInfo.innerHTML = detailsPeriodes[periodeId - 1].nom
 }
 
 function updateSlider(periodeId) {
     slider.value = periodeId;
+}
+
+function callDisplayFunctions(i){
+    displayAllHeatMapFromPeriode(i)
+    displayStatisticsFromPeriode(i)
+    displeyPeriodeDetails(i)
+    updateSlider(i)
 }
 
 
@@ -353,7 +362,7 @@ function animate() {
 }
 
 
-let i = 0;
+let i = 1;
 
 function play() {
     if (i >= allPeriodes.length || i < 0) {
@@ -371,13 +380,6 @@ function stop() {
     clearInterval(nIntervId);
     nIntervId = null;
     playing = false
-}
-
-function callDisplayFunctions(i){
-    displayAllHeatMapFromPeriode(i)
-    displayStatisticsFromPeriode(i)
-    displeyPeriodeDetails(i)
-    updateSlider(i)
 }
 
 
@@ -403,4 +405,5 @@ btnPlay.addEventListener('click', () => {
 })
 
 /***** APPEL DES FONCTIONS / CONFIG ******/
+callDisplayFunctions(i);
 animate()
