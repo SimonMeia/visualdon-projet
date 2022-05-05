@@ -7,11 +7,30 @@ const btnPrevious = document.querySelector('#btn-previous')
 const btnNext = document.querySelector('#btn-next')
 const btnPause = document.querySelector('#btn-pause')
 const btnPlay = document.querySelector('#btn-play')
+const sliderDiv = document.querySelector('#slider')
 
-let playing = false;
+const periodeDeLannee = document.querySelector('#periode-annee')
+const periodeInfo = document.querySelector('#periodeInfos')
 
-let heatmapgraphic = document.querySelector('#heatmap-graphic');
+const btnNavPeriode = document.querySelector('#nav-periode')
+const btnNavAll = document.querySelector('#nav-all')
+
+let heatmapgraphic = document.querySelector('#heatmap-graphic')
+let colorDefinition = document.querySelector('#color-meaning')
+
+let plusTard = document.querySelector('#couchePlusTard span.heure')
+let plusTot = document.querySelector('#couchePlusTot span.heure')
+let moyenneSemaine = document.querySelector('#moyenneSemaine span.heure')
+let moyenneWeekend = document.querySelector('#moyenneWeekend span.heure')
+
+let playing = false
+
 let allPeriodes = createAllPeriodesData(heuresDeCoucher)
+
+let heatmapColors = d3.scaleThreshold()
+    .domain([-240, -120, 0, 120, 240, 360])
+    .range(d3.schemeBlues[6])
+
 
 
 /*********** MISE EN FORME DES DONNEES ***********/
@@ -24,15 +43,15 @@ let allPeriodes = createAllPeriodesData(heuresDeCoucher)
  */
 function createHeatMapData(monthData) {
 
-    let firstDayOfMonth = getFirstDayOfMonth(monthData[0].date.getFullYear(), monthData[0].date.getMonth());
+    let firstDayOfMonth = getFirstDayOfMonth(monthData[0].date.getFullYear(), monthData[0].date.getMonth())
     let nomJourSemaine = ['Lu', 'Ma', 'Me', 'Je', 'Ve', 'Sa', 'Di']
-    let dataArray = [];
+    let dataArray = []
     let compteurJour = 0;
 
     for (let ligne = 0; ligne < 5; ligne++) {
         for (let col = 0; col < 7; col++) {
             let jourSemaine = nomJourSemaine[col]
-            let added = false;
+            let added = false
 
             if (compteurJour == 0 && col == convertGetDay(firstDayOfMonth.getDay())) {
                 compteurJour++
@@ -52,7 +71,7 @@ function createHeatMapData(monthData) {
 
         }
     }
-    return dataArray;
+    return dataArray
 }
 
 /**
@@ -62,7 +81,7 @@ function createHeatMapData(monthData) {
  */
 function createAllHeatMapDataFromPeriod(periodData) {
     let usableData = getUsableDates(periodData)
-    let nbMonth = [];
+    let nbMonth = []
     for (const date of usableData) {
         if (!nbMonth.includes(date.date.getMonth())) {
             nbMonth.push(date.date.getMonth())
@@ -74,6 +93,38 @@ function createAllHeatMapDataFromPeriod(periodData) {
         allData.push([])
         for (let date of usableData) {
             if (date.date.getMonth() == nbMonth[i]) {
+                allData[i].push(date)
+            }
+        }
+    }
+
+    let finalData = []
+    for (let data of allData) {
+        finalData.push(createHeatMapData(data))
+    }
+    return (finalData)
+}
+
+/**
+ * Crée un tableau contenant x tableaux qui correspondent chacun à un mois de données
+ * @param {array} periodData 
+ * @returns 
+ */
+function createHeatMapDataFromAllPeriode() {
+
+    let usableData = getUsableDates(heuresDeCoucher)
+    let nbMonth = []
+    for (const date of usableData) {
+        if (!nbMonth.includes(date.date.getMonth() + "-" + date.date.getFullYear())) {
+            nbMonth.push(date.date.getMonth() + "-" + date.date.getFullYear())
+        }
+    }
+
+    let allData = []
+    for (let i = 0; i < nbMonth.length; i++) {
+        allData.push([])
+        for (let date of usableData) {
+            if (date.date.getMonth() + "-" + date.date.getFullYear() == nbMonth[i]) {
                 allData[i].push(date)
             }
         }
@@ -103,7 +154,7 @@ function createAllPeriodesData(allData) {
         }
         periodes.push(createAllHeatMapDataFromPeriod(tempArray))
     }
-    return periodes;
+    return periodes
 }
 
 /**
@@ -122,7 +173,24 @@ function getPeriodeStatistics(periodeId) {
         }
     }
 
-    let minuitesMinuitFromPeriode = concatPeriodeData.map(d => {
+    return getStatistics(concatPeriodeData)
+
+}
+
+function getAllStatistics() {
+    let concatData = []
+    for (let periode of allPeriodes) {
+        for (let mois of periode) {
+            concatData = concatData.concat(mois)
+        }
+    }
+    return getStatistics(concatData)
+}
+
+function getStatistics(dataArray) {
+
+
+    let minuitesMinuitAndWeekend = dataArray.map(d => {
         if (d.date.getDay() == 6 || d.date.getDay() == 5) {
             return { "minutesMinuit": d.minutesMinuit, "weekend": "weekend" }
         } else {
@@ -130,14 +198,16 @@ function getPeriodeStatistics(periodeId) {
         }
     })
 
-    let moyenneSemaine = 0;
-    let nbWeekend = 0;
-    let nbSemaine = 0;
-    let moyenneWeekend = 0;
-    let plusTard = 0;
-    let plusTot = 0;
+    let moyenneSemaine = 0
+    let nbWeekend = 0
+    let nbSemaine = 0
+    let moyenneWeekend = 0
+    let plusTard = 0
+    let plusTot = 0
+    let nbApresMinuit = 0
+    let nbAvantMinuit = 0
 
-    for (const date of minuitesMinuitFromPeriode) {
+    for (const date of minuitesMinuitAndWeekend) {
         if (date.minutesMinuit > plusTard) {
             plusTard = date.minutesMinuit
         }
@@ -151,11 +221,25 @@ function getPeriodeStatistics(periodeId) {
             moyenneWeekend += date.minutesMinuit
             nbWeekend++
         }
+        if (date.minutesMinuit >= 0) {
+            nbApresMinuit++
+        } else {
+            nbAvantMinuit++
+        }
     }
     moyenneWeekend = moyenneWeekend / nbWeekend
     moyenneSemaine = (moyenneSemaine / nbSemaine)
 
-    return { "plusTard": plusTard, "plusTot": plusTot, "moyenneSemaine": moyenneSemaine, "moyenneWeekend": moyenneWeekend }
+    return {
+        "plusTard": plusTard,
+        "plusTot": plusTot,
+        "moyenneSemaine": moyenneSemaine,
+        "moyenneWeekend": moyenneWeekend,
+        "nbSemaine": nbSemaine,
+        "nbWeekend": nbWeekend,
+        "nbApresMinuit": nbApresMinuit,
+        "nbAvantMinuit": nbAvantMinuit
+    }
 }
 
 /**
@@ -165,7 +249,7 @@ function getPeriodeStatistics(periodeId) {
  * @returns {Date}
  */
 function getFirstDayOfMonth(year, month) {
-    return new Date(year, month, 1);
+    return new Date(year, month, 1)
 }
 
 /**
@@ -201,20 +285,20 @@ function convertGetDay(day) {
  * @param {int} n 
  * @returns {String}
  */
-function convertMinuites(n) {
+function convertMinutes(n) {
 
     if (isNaN(n)) return "--H--M"
 
-    let num = n;
-    let hours = (num / 60);
-    let rhours = Math.floor(hours);
-    let minutes = (hours - rhours) * 60;
-    let rminutes = Math.round(minutes);
+    let num = n
+    let hours = (num / 60)
+    let rhours = Math.floor(hours)
+    let minutes = (hours - rhours) * 60
+    let rminutes = Math.round(minutes)
 
     if (n < 0) {
-        return addZero(24 + rhours) + "h" + addZero(60 - rminutes) + "m";
+        return addZero(24 + rhours) + ":" + addZero(rminutes)
     } else {
-        return addZero(rhours) + "h" + addZero(rminutes) + "m";
+        return addZero(rhours) + ":" + addZero(rminutes)
     }
 }
 
@@ -238,11 +322,11 @@ function displayHeatMap(chartData, heatMapID) {
     // set the dimensions and margins of the graph
     let margin = { top: 30, right: 30, bottom: 30, left: 30 },
         width = 250 - margin.left - margin.right,
-        height = 200 - margin.top - margin.bottom;
+        height = 200 - margin.top - margin.bottom
 
     // Labels of row and columns
-    var semaine = [4, 3, 2, 1, 0]
-    var jourSemaine = ["Lu", "Ma", "Me", "Je", "Ve", "Sa", "Di"]
+    let semaine = [4, 3, 2, 1, 0]
+    let jourSemaine = ["Lu", "Ma", "Me", "Je", "Ve", "Sa", "Di"]
 
     // append the svg object to the body of the page
     let idName = "heatmap-" + heatMapID
@@ -256,10 +340,10 @@ function displayHeatMap(chartData, heatMapID) {
         .attr("height", height + margin.top + margin.bottom)
         .append("g")
         .attr("transform",
-            "translate(" + margin.left + "," + margin.top + ")");
+            "translate(" + margin.left + "," + margin.top + ")")
 
     // Build X scales and axis:
-    var x = d3.scaleBand()
+    let x = d3.scaleBand()
         .range([0, width])
         .domain(jourSemaine)
         .padding(0.01);
@@ -268,17 +352,37 @@ function displayHeatMap(chartData, heatMapID) {
         .call(d3.axisBottom(x))
 
     // Build X scales and axis:
-    var y = d3.scaleBand()
+    let y = d3.scaleBand()
         .range([height, 0])
         .domain(semaine)
-        .padding(0.01);
+        .padding(0.01)
     // currentHeatmapGraphic.append("g")
     // .call(d3.axisLeft(y));
 
-    // Build color scale
-    var myColor = d3.scaleThreshold()
-        .domain([-240, -120, 0, 120, 240, 360])
-        .range(d3.schemeBlues[6])
+    // create a tooltip
+    const tooltip = d3.select(idNameSelector)
+        .append("div")
+        .style("opacity", 0)
+        .attr("class", "tooltip")
+        .style("background-color", "white")
+        .style("border", "solid")
+        .style("border-width", "2px")
+        .style("border-radius", "5px")
+        .style("padding", "5px")
+        .style("padding", "5px")
+        .style("position", "fixed")
+
+    // Three function that change the tooltip when user / move / leave a cell
+    const mousemove = function (event, d) {
+        console.log(d.date.getMonth());
+        tooltip.style("opacity", 1)
+            .html(addZero(d.date.getDate()) + "." + addZero(d.date.getMonth() + 1) + "." + addZero(d.date.getFullYear()) + " - " + convertMinutes(d.minutesMinuit))
+            .style("left", (event.x + 20) + "px")
+            .style("top", (event.y + 20) + "px")
+    }
+    const mouseleave = function (d) {
+        tooltip.style("opacity", 0)
+    }
 
     //Read the data
     currentHeatmapGraphic.selectAll()
@@ -289,7 +393,9 @@ function displayHeatMap(chartData, heatMapID) {
         .attr("y", function (d) { return y(d.ligne) - 2.5 })
         .attr("width", x.bandwidth() / 1.1)
         .attr("height", y.bandwidth() / 1.1)
-        .style("fill", function (d) { return myColor(d.minutesMinuit) })
+        .style("fill", function (d) { return heatmapColors(d.minutesMinuit) })
+        .on("mousemove", mousemove)
+        .on("mouseleave", mouseleave)
 
 
     // Ajout du mois sous le graphic
@@ -302,12 +408,25 @@ function displayHeatMap(chartData, heatMapID) {
     p.classList.add('moisHeatMap')
 
     document.querySelector(idNameSelector).append(p)
+
 }
 
 function displayAllHeatMapFromPeriode(periodeId) {
     let periodeData = allPeriodes[periodeId - 1]
     while (heatmapgraphic.firstChild) {
-        heatmapgraphic.removeChild(heatmapgraphic.firstChild);
+        heatmapgraphic.removeChild(heatmapgraphic.firstChild)
+    }
+    let counter = 1
+    for (const dataSet of periodeData) {
+        displayHeatMap(dataSet, counter)
+        counter++
+    }
+}
+
+function displayAllHeatMapFromAllPeriode() {
+    let periodeData = createHeatMapDataFromAllPeriode()
+    while (heatmapgraphic.firstChild) {
+        heatmapgraphic.removeChild(heatmapgraphic.firstChild)
     }
     let counter = 1
     for (const dataSet of periodeData) {
@@ -318,34 +437,87 @@ function displayAllHeatMapFromPeriode(periodeId) {
 
 function displayStatisticsFromPeriode(periodeId) {
     let statistics = getPeriodeStatistics(periodeId)
+    displayStatistics(statistics)
+}
 
-    let plusTard = document.querySelector('#couchePlusTard span.heure')
-    let plusTot = document.querySelector('#couchePlusTot span.heure')
-    let moyenneSemaine = document.querySelector('#moyenneSemaine span.heure')
-    let moyenneWeekend = document.querySelector('#moyenneWeekend span.heure')
+function displayStatisticsFromAllPeriode() {
+    let statistics = getAllStatistics()
+    displayStatistics(statistics)
+}
 
-    plusTard.innerHTML = convertMinuites(statistics.plusTard)
-    plusTot.innerHTML = convertMinuites(statistics.plusTot)
-    moyenneSemaine.innerHTML = convertMinuites(statistics.moyenneSemaine)
-    moyenneWeekend.innerHTML = convertMinuites(statistics.moyenneWeekend)
-
+function displayStatistics(statistics) {
+    plusTard.innerHTML = convertMinutes(statistics.plusTard)
+    plusTot.innerHTML = convertMinutes(statistics.plusTot)
+    moyenneSemaine.innerHTML = convertMinutes(statistics.moyenneSemaine)
+    moyenneWeekend.innerHTML = convertMinutes(statistics.moyenneWeekend)
 }
 
 function displeyPeriodeDetails(periodeId) {
     let periodeInfo = document.querySelector('#periodeInfos h3')
-    console.log(detailsPeriodes);
     periodeInfo.innerHTML = detailsPeriodes[periodeId - 1].nom
+}
+
+function displayColorMeaning() {
+    // Ajout la défintion des couleurs
+    colorDefinition.append(convertMinutes(heatmapColors.domain()[0]))
+    let colorDefinitionD3 = d3.select('#color-meaning')
+        .append("svg")
+        .attr('width', 160)
+        .attr('height', 25)
+
+    // console.log(heatmapColors.range());
+    let counter = 0
+    for (const color of heatmapColors.domain()) {
+        // console.log(color);
+        // console.log(heatmapColors(color));
+        colorDefinitionD3
+            .append('rect')
+            .attr('width', 25)
+            .attr('height', 25)
+            .attr('x', 25 * counter + 5)
+            .attr('y', 0)
+            .style('fill', function (d) { return heatmapColors(color) })
+        // .style('fill', function (d) { return heatmapColors(color*-1) })
+        counter++
+    }
+
+    colorDefinition.append(convertMinutes(heatmapColors.domain()[heatmapColors.domain().length - 1]))
 }
 
 function updateSlider(periodeId) {
     slider.value = periodeId;
 }
 
-function callDisplayFunctions(i){
+function callPeriodeDisplayFunctions(i) {
     displayAllHeatMapFromPeriode(i)
     displayStatisticsFromPeriode(i)
     displeyPeriodeDetails(i)
     updateSlider(i)
+}
+
+function callAllPeriodesDisplayFunctions(i) {
+    displayAllHeatMapFromAllPeriode()
+    displayStatisticsFromAllPeriode()
+}
+
+
+/********** NAVIGATION **********/
+
+function toggleParPeriode() {
+    // btnNavPeriode.disabled = true;
+    sliderDiv.classList.remove('hidden')
+    periodeDeLannee.innerHTML = "Prériode de l'année"
+    periodeInfo.classList.remove('hidden')
+    callPeriodeDisplayFunctions(i)
+    animate()
+}
+
+function toggleAll() {
+    sliderDiv.classList.add('hidden')
+    periodeDeLannee.innerHTML = "Mois / Année"
+    periodeInfo.classList.add('hidden')
+    callAllPeriodesDisplayFunctions()
+    stop()
 }
 
 
@@ -354,6 +526,7 @@ function callDisplayFunctions(i){
 // Variable où on stocke l'id de notre intervalle
 let nIntervId;
 
+// Gestion des la boucle d'animation
 function animate() {
     // regarder si l'intervalle a été déjà démarré
     if (!nIntervId) {
@@ -362,8 +535,8 @@ function animate() {
 }
 
 
+// Boucle répétée à chaque itération
 let i = 1;
-
 function play() {
     if (i >= allPeriodes.length || i < 0) {
         i = 1;
@@ -372,7 +545,7 @@ function play() {
     }
 
     playing = true
-    callDisplayFunctions(i)
+    callPeriodeDisplayFunctions(i)
 }
 
 // Mettre en pause
@@ -387,15 +560,23 @@ function stop() {
 
 slider.addEventListener('change', () => {
     i = slider.value
-    callDisplayFunctions(i)
+    callPeriodeDisplayFunctions(i)
 })
 btnPrevious.addEventListener('click', () => {
-    i--
-    callDisplayFunctions(i)
+    if (i - 1 == 0) {
+        i = 1
+    } else {
+        i--
+    }
+    callPeriodeDisplayFunctions(i)
 })
 btnNext.addEventListener('click', () => {
-    i++
-    callDisplayFunctions(i)
+    if (i + 1 > allPeriodes.length) {
+        i = 1
+    } else {
+        i++
+    }
+    callPeriodeDisplayFunctions(i)
 })
 btnPause.addEventListener('click', () => stop())
 btnPlay.addEventListener('click', () => {
@@ -403,7 +584,11 @@ btnPlay.addEventListener('click', () => {
         animate()
     }
 })
+btnNavAll.addEventListener('click', toggleAll)
+btnNavPeriode.addEventListener('click', toggleParPeriode)
 
 /***** APPEL DES FONCTIONS / CONFIG ******/
-callDisplayFunctions(i);
-animate()
+// displayAllHeatMapFromAllPeriode()
+callPeriodeDisplayFunctions(i);
+displayColorMeaning();
+toggleParPeriode()

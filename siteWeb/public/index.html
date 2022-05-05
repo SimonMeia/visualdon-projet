@@ -26,14 +26,19 @@
             Les données commencent le 11 février 2020 et se terminent le 27 février 2022 ce qui correspond à 748 nuits.
             Sur ces 748 nuits mes données en rescencent 645.
         </p>
-        <p style="margin-bottom :1.67em;">
+        <p>
             Les données ont été séparées en 20 périodes qui correspondent chacune à une phase de l'année bien définie.
         </p>
+        <nav>
+            <h3>Tri des données : </h3>
+            <button id="nav-periode">Par période</button>
+            <button id="nav-all">Toute les données</button>
+        </nav>
     </header>
     <main>
         <div id="periodes">
             <div id="periodeContent">
-                <h2>Periodes de l'année</h2>
+                <h2 id="periode-annee">Periodes de l'année</h2>
                 <div id="slider">
                     <input id="slider-input" type="range" min="1" max="20">
                     <button id="btn-previous">
@@ -64,13 +69,13 @@
             <div id="heatmap-global">
                 <div id="heatmap">
                     <div id="heatmapContent">
-                        <!-- <h3>Heatmap</h3> -->
                         <div id="heatmap-graphic"></div>
+                        <div id="color-meaning"></div>
                     </div>
                 </div>
                 <div id="statistiques">
+                    <h3 id="stat-title">Statistiques</h3>
                     <div id="statistiquesContent">
-
                         <div class="statistique" id="couchePlusTot">
                             <span class="statLabel">Le plus tôt : </span>
                             <span class="heure">4h20</span>
@@ -91,13 +96,10 @@
                 </div>
             </div>
         </div>
-        <div id="extremes">
-            <div id="etremesContent">
-                <h2>Les extrêmes</h2>
+        <div id="repartition">
+            <div id="repartitionContent">
+                <h3>Répartition</h3>
             </div>
-        </div>
-        <div id="tranches">
-            <h2>Tranches horaire</h2>
         </div>
     </main>
 </body>
