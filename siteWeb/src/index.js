@@ -29,7 +29,7 @@ let allPeriodes = createAllPeriodesData(heuresDeCoucher)
 
 let heatmapColors = d3.scaleThreshold()
     .domain([-240, -120, 0, 120, 240, 360])
-    .range(d3.schemeBlues[6])
+    .range(d3.schemeBlues[7])
 
 
 
@@ -588,7 +588,6 @@ btnNavAll.addEventListener('click', toggleAll)
 btnNavPeriode.addEventListener('click', toggleParPeriode)
 
 /***** APPEL DES FONCTIONS / CONFIG ******/
-// displayAllHeatMapFromAllPeriode()
 callPeriodeDisplayFunctions(i);
 displayColorMeaning();
 toggleParPeriode()
