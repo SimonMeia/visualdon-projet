@@ -1,7 +1,9 @@
+// Imports
 import heuresDeCoucher from '../data/heureDeCoucher_Data.csv'
 import detailsPeriodes from '../data/periodes_Data.csv'
 import * as d3 from 'd3'
 
+// Elements DOM de la timeline
 const slider = document.querySelector('#slider-input')
 const btnPrevious = document.querySelector('#btn-previous')
 const btnNext = document.querySelector('#btn-next')
@@ -9,24 +11,31 @@ const btnPause = document.querySelector('#btn-pause')
 const btnPlay = document.querySelector('#btn-play')
 const sliderDiv = document.querySelector('#slider')
 
+// Elements DOM des periodes
 const periodeDeLannee = document.querySelector('#periode-annee')
 const periodeInfo = document.querySelector('#periodeInfos')
 
+// Boutons de navigation
 const btnNavPeriode = document.querySelector('#nav-periode')
 const btnNavAll = document.querySelector('#nav-all')
 
+// Elements DOM du heatmap
 let heatmapgraphic = document.querySelector('#heatmap-graphic')
 let colorDefinition = document.querySelector('#color-meaning')
 
+// Elements DOM des statistiques
 let plusTard = document.querySelector('#couchePlusTard span.heure')
 let plusTot = document.querySelector('#couchePlusTot span.heure')
 let moyenneSemaine = document.querySelector('#moyenneSemaine span.heure')
 let moyenneWeekend = document.querySelector('#moyenneWeekend span.heure')
 
+// En animation ou non
 let playing = false
 
+// Tableau contenant un tableau par période
 let allPeriodes = createAllPeriodesData(heuresDeCoucher)
 
+// Range de couleurs utilisées dans le heatmap
 let heatmapColors = d3.scaleThreshold()
     .domain([-240, -120, 0, 120, 240, 360])
     .range(d3.schemeBlues[7])
@@ -36,10 +45,9 @@ let heatmapColors = d3.scaleThreshold()
 /*********** MISE EN FORME DES DONNEES ***********/
 
 /**
- * Créer un tableau de 7 case de long et 5 cases de haut pour un mois de données. 
- * Dans les cases contenant des donnes, il y a un objet {col, ligne, minuteMinuit, date}
- * @param {array} monthData 
- * @returns {array}
+ * Met en forme les données pour un mois de données pour qu'elle soient utilisable dans les méthodes de display
+ * @param {array} monthData {Date, minuteMinuit}
+ * @returns {array} Tableau de 5 row et 7 cols. Dans les cases contenant des donnes, il y a un objet {col, ligne, minuteMinuit, date}
  */
 function createHeatMapData(monthData) {
 
@@ -75,9 +83,9 @@ function createHeatMapData(monthData) {
 }
 
 /**
- * Crée un tableau contenant x tableaux qui correspondent chacun à un mois de données de la période
- * @param {array} periodData 
- * @returns 
+ * Met en forme les données d'une période pour qu'elle soient utilisable dans les méthodes de display
+ * @param {array} periodData Données non éditées d'une période entière
+ * @returns {array} Tableau contenant x tableaux qui correspondent chacun à un mois de données de la période
  */
 function createAllHeatMapDataFromPeriod(periodData) {
     let usableData = getUsableDates(periodData)
@@ -106,9 +114,28 @@ function createAllHeatMapDataFromPeriod(periodData) {
 }
 
 /**
- * Crée un tableau contenant x tableaux qui correspondent chacun à un mois de données
- * @param {array} periodData 
- * @returns 
+ * Met en forme les données pour toutes les periodes afin qu'elles soient utilisables pas les méthodes de display
+ * @param {array} allData Jeu de données de base {dateDebut, dateFin, heureCoucher, minuteMinuit, periode}
+ * @returns {array} Tableau contenant un tableau par periode
+ */
+ function createAllPeriodesData(allData) {
+    let periodes = []
+    let nbPeriodes = allData[allData.length - 1].periode
+    for (let i = 0; i < nbPeriodes; i++) {
+        let tempArray = []
+        for (const date of allData) {
+            if (date.periode == i + 1) {
+                tempArray.push(date)
+            }
+        }
+        periodes.push(createAllHeatMapDataFromPeriod(tempArray))
+    }
+    return periodes
+}
+
+/**
+ * Met en forme les données pour toutes les périodes pour qu'elles soient utilisable dans les méthodes de display
+ * @returns Tableau contenant x tableaux qui correspondent chacun à un mois de données
  */
 function createHeatMapDataFromAllPeriode() {
 
@@ -138,55 +165,10 @@ function createHeatMapDataFromAllPeriode() {
 }
 
 /**
- * Créer un tableau contenant x tableaux qui correspondent chacun à une période de donnée
- * @param {array} allData 
- * @returns 
+ * Retourne les statistiques d'un tableau de données
+ * @param {array} dataArray Données dont il faut extraire les statistiques
+ * @returns {Object} Objet contenant une propriété par statistiques
  */
-function createAllPeriodesData(allData) {
-    let periodes = []
-    let nbPeriodes = allData[allData.length - 1].periode
-    for (let i = 0; i < nbPeriodes; i++) {
-        let tempArray = []
-        for (const date of allData) {
-            if (date.periode == i + 1) {
-                tempArray.push(date)
-            }
-        }
-        periodes.push(createAllHeatMapDataFromPeriod(tempArray))
-    }
-    return periodes
-}
-
-/**
- * Récupère et calcul les statistiques à afficher en dessous des heatmap
- * @param {int} periodeId 
- * @returns {Object}
- */
-function getPeriodeStatistics(periodeId) {
-
-    let periodeData = allPeriodes[periodeId - 1]
-    let concatPeriodeData = periodeData[0]
-
-    if (periodeData.length > 0) {
-        for (let i = 1; i < periodeData.length; i++) {
-            concatPeriodeData = concatPeriodeData.concat(periodeData[i])
-        }
-    }
-
-    return getStatistics(concatPeriodeData)
-
-}
-
-function getAllStatistics() {
-    let concatData = []
-    for (let periode of allPeriodes) {
-        for (let mois of periode) {
-            concatData = concatData.concat(mois)
-        }
-    }
-    return getStatistics(concatData)
-}
-
 function getStatistics(dataArray) {
 
 
@@ -243,6 +225,40 @@ function getStatistics(dataArray) {
 }
 
 /**
+ * Récupère et calcul les statistiques à afficher en dessous des heatmap par rapport à une période affichée
+ * @param {int} periodeId id de la période actuellement affichée
+ * @returns {Object} Objet contenant une propriété par statistiques
+ */
+function getPeriodeStatistics(periodeId) {
+
+    let periodeData = allPeriodes[periodeId - 1]
+    let concatPeriodeData = periodeData[0]
+
+    if (periodeData.length > 0) {
+        for (let i = 1; i < periodeData.length; i++) {
+            concatPeriodeData = concatPeriodeData.concat(periodeData[i])
+        }
+    }
+
+    return getStatistics(concatPeriodeData)
+
+}
+
+/**
+ * Récupère et calcul les statistiques à afficher en dessous des heatmap par rapport à toutes les périodes
+ * @returns {Object} Objet contenant une propriété par statistiques
+ */
+function getAllStatistics() {
+    let concatData = []
+    for (let periode of allPeriodes) {
+        for (let mois of periode) {
+            concatData = concatData.concat(mois)
+        }
+    }
+    return getStatistics(concatData)
+}
+
+/**
  * Retourne un objet date contenant le premier jour d'un mois donné dans un année
  * @param {int} year 
  * @param {int} month 
@@ -253,24 +269,25 @@ function getFirstDayOfMonth(year, month) {
 }
 
 /**
- * Renvoie un tableau contenant les données mise en forme au format {date, minutesMinuit}
- * @param {array} monthData 
- * @returns {array}
+ * Modifie un objet pour qu'il soit utilisables dans les méthodes de création de heatmapData
+ * @param {array} datesArray Tableau contenant les date à modifier. Format {dateDebut, dateFin, heureCoucher, minuteMinuit, periode}
+ * @returns {array} Tableau d'objet {date, minuteMinuit}
  */
-function getUsableDates(monthData) {
-    let usableMonthData = []
-
-    for (let date of monthData) {
-        usableMonthData.push({ "date": new Date(date.dateFrom), "minutesMinuit": date.minutesMinuit })
+function getUsableDates(datesArray) {
+    let usableDatesArray = []
+    
+    for (let date of datesArray) {
+        usableDatesArray.push({ "date": new Date(date.dateFrom), "minutesMinuit": date.minutesMinuit })
     }
-
-    return usableMonthData
+    
+    console.log(usableDatesArray);
+    return usableDatesArray
 }
 
 /**
  * Converti le numéro d'un jour dans un format ou 0 = lundi et 6 = dimanche
- * @param {int} day 
- * @returns 
+ * @param {int} day numéro de jour à convertir
+ * @returns {int} nouveau numéro de jour
  */
 function convertGetDay(day) {
     switch (day) {
@@ -316,7 +333,11 @@ function addZero(number) {
 
 
 /*********** AFFICHAGE + GRAPHIQUES ***********/
-
+/**
+ * Afficher une heatmap un fonction d'un id
+ * @param {array} chartData Tableau contenant toutes les périodes
+ * @param {int} heatMapID Id de l'heatmap à afficher
+ */
 function displayHeatMap(chartData, heatMapID) {
 
     // set the dimensions and margins of the graph
@@ -411,6 +432,10 @@ function displayHeatMap(chartData, heatMapID) {
 
 }
 
+/**
+ * Afficher toutes les heatmap d'une période donnée
+ * @param {int} periodeId id de la période à afficher
+ */
 function displayAllHeatMapFromPeriode(periodeId) {
     let periodeData = allPeriodes[periodeId - 1]
     while (heatmapgraphic.firstChild) {
@@ -423,6 +448,9 @@ function displayAllHeatMapFromPeriode(periodeId) {
     }
 }
 
+/**
+ * Affiche les heatmap de toutes les périodes
+ */
 function displayAllHeatMapFromAllPeriode() {
     let periodeData = createHeatMapDataFromAllPeriode()
     while (heatmapgraphic.firstChild) {
@@ -435,16 +463,27 @@ function displayAllHeatMapFromAllPeriode() {
     }
 }
 
+/**
+ * Afficher les statistiques d'une période donnéée
+ * @param {int} periodeId id de la période dont on veut afficher les statistiques
+ */
 function displayStatisticsFromPeriode(periodeId) {
     let statistics = getPeriodeStatistics(periodeId)
     displayStatistics(statistics)
 }
 
+/**
+ * Affiche les statistiques de tout le jeu de donnée
+ */
 function displayStatisticsFromAllPeriode() {
     let statistics = getAllStatistics()
     displayStatistics(statistics)
 }
 
+/**
+ * Affiche les statistiques a partir d'un objet
+ * @param {Objet} statistics Objet contenant les statistiques à afficher
+ */
 function displayStatistics(statistics) {
     plusTard.innerHTML = convertMinutes(statistics.plusTard)
     plusTot.innerHTML = convertMinutes(statistics.plusTot)
@@ -452,11 +491,18 @@ function displayStatistics(statistics) {
     moyenneWeekend.innerHTML = convertMinutes(statistics.moyenneWeekend)
 }
 
+/**
+ * Affiche le nom et les détails d'une période
+ * @param {int} periodeId id de la période dont on veut afficher les détail
+ */
 function displeyPeriodeDetails(periodeId) {
     let periodeInfo = document.querySelector('#periodeInfos h3')
     periodeInfo.innerHTML = detailsPeriodes[periodeId - 1].nom
 }
 
+/**
+ * Affiche les petits carrés de références pour les heatmap
+ */
 function displayColorMeaning() {
     // Ajout la défintion des couleurs
     colorDefinition.append(convertMinutes(heatmapColors.domain()[0]))
@@ -484,10 +530,18 @@ function displayColorMeaning() {
     colorDefinition.append(convertMinutes(heatmapColors.domain()[heatmapColors.domain().length - 1]))
 }
 
+/**
+ * Met à jour la valeur et la position du slider
+ * @param {int} periodeId Id de la période en cours
+ */
 function updateSlider(periodeId) {
     slider.value = periodeId;
 }
 
+/**
+ * Appelle toutes les fonction d'affichage pour une période
+ * @param {int} i Période dont on veut afficher les graphiques
+ */
 function callPeriodeDisplayFunctions(i) {
     displayAllHeatMapFromPeriode(i)
     displayStatisticsFromPeriode(i)
@@ -495,7 +549,10 @@ function callPeriodeDisplayFunctions(i) {
     updateSlider(i)
 }
 
-function callAllPeriodesDisplayFunctions(i) {
+/**
+ * Applelle toutes les fonction pour l'affichage de tous les mois
+ */
+function callAllPeriodesDisplayFunctions() {
     displayAllHeatMapFromAllPeriode()
     displayStatisticsFromAllPeriode()
 }
