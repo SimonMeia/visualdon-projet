@@ -101,11 +101,6 @@ body {
     padding: 20px;
 }
 
-
-.statIcon {
-    /* flex-grow: 1; */
-}
-
 .statLabel {
     flex-grow: 2;
 }

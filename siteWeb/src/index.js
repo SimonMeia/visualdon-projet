@@ -37,8 +37,8 @@ let allPeriodes = createAllPeriodesData(heuresDeCoucher)
 
 // Range de couleurs utilisées dans le heatmap
 let heatmapColors = d3.scaleThreshold()
-    .domain([-240, -120, 0, 120, 240, 360])
-    .range(d3.schemeBlues[7])
+    .domain([-240, -120, 0, 120, 240])
+    .range(d3.schemeBlues[6])
 
 
 
@@ -508,7 +508,7 @@ function displayColorMeaning() {
     colorDefinition.append(convertMinutes(heatmapColors.domain()[0]))
     let colorDefinitionD3 = d3.select('#color-meaning')
         .append("svg")
-        .attr('width', 160)
+        .attr('width', 135)
         .attr('height', 25)
 
     // console.log(heatmapColors.range());
