@@ -43,6 +43,7 @@ body {
     margin: 0.25rem;
     height: 3rem;
     width: 4rem;
+    cursor: pointer;
 }
 
 #slider span {
@@ -99,6 +100,12 @@ body {
     align-items: baseline;
     border-radius: 5px;
     padding: 20px;
+}
+
+.btn-nav{
+    width: 20%;
+    height: 2.5rem;
+    cursor: pointer;
 }
 
 .statLabel {
