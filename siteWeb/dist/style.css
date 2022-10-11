@@ -1,0 +1,125 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+
+html {
+    background-color: rgb(34, 72, 160);
+    font-family: Roboto;
+    color: white;
+}
+
+nav {
+    padding-bottom: 1.60rem;
+}
+
+#heatmapContent,
+#statistiquesContent,
+#repartitionContent {
+    width: 1080px;
+    margin: auto;
+    text-align: center;
+}
+
+header,
+#periodeContent {
+    width: 800px;
+    ;
+    margin: auto;
+    text-align: center;
+}
+
+body {
+    margin: 0;
+}
+
+#slider {
+    display: flex;
+}
+
+#slider input {
+    width: 100%;
+    accent-color: rgb(34, 72, 160);
+}
+
+#slider button {
+    margin: 0.25rem;
+    height: 3rem;
+    width: 4rem;
+    cursor: pointer;
+}
+
+#slider span {
+    vertical-align: middle;
+    font-size: 1.5rem;
+}
+
+#heatmap,
+#periodes {
+    background-color: aliceblue;
+    color: rgb(34, 72, 160);
+}
+
+#heatmap-graphic {
+    width: 1080px;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+#heatmapContent,
+#periodeContent {
+    padding-top: 1px;
+}
+
+.moisHeatMap {
+    margin-top: 0px;
+    text-align: center;
+}
+
+#stat-title {
+    text-align: center;
+}
+
+#statistiques {
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+#statistiquesContent {
+    text-align: left;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.statistique {
+    display: flex;
+    flex-basis: 30%;
+    background-color: rgb(34, 72, 160);
+    color: aliceblue;
+    margin: 10px;
+    align-items: baseline;
+    border-radius: 5px;
+    padding: 20px;
+}
+
+.btn-nav{
+    width: 20%;
+    height: 2.5rem;
+    cursor: pointer;
+}
+
+.statLabel {
+    flex-grow: 2;
+}
+
+.heure {
+    font-size: x-large;
+}
+
+#color-meaning {
+    vertical-align: middle;
+}
+
+.hidden {
+    display: none !important;
+}
