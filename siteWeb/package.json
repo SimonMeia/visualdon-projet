@@ -5,6 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "build": "babel src -d lib",
+    "prod": "webpack",
     "start": "webpack-dev-server"
   },
   "author": "Simon Meia",
